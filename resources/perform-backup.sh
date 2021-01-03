@@ -70,6 +70,7 @@ for CURRENT_DATABASE in $(mysql -u $TARGET_DATABASE_USER -p$TARGET_DATABASE_PASS
 
               # Perform the upload to S3. Put the output to a variable. If successful, print an entry to the console and the log. If unsuccessful, set has_failed to true and print an entry to the console and the log
               if awsoutput=$(aws $ENDPOINT s3 cp /tmp/$DUMP s3://$AWS_BUCKET_NAME$AWS_BUCKET_BACKUP_PATH/$DUMP 2>&1); then
+                  cmdid=$(aws $ENDPOINT s3 rm s3://$AWS_BUCKET_NAME$AWS_BUCKET_BACKUP_PATH/ --recursive --exclude "*" --include "$CURRENT_DATABASE*.sql" --exclude "$DUMP")
                   echo -e "Database backup successfully uploaded for $CURRENT_DATABASE at $(date +'%d-%m-%Y %H:%M:%S')."
               else
                   echo -e "Database backup failed to upload for $CURRENT_DATABASE at $(date +'%d-%m-%Y %H:%M:%S'). Error: $awsoutput" | tee -a /tmp/kubernetes-cloud-mysql-backup.log
