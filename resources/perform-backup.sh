@@ -25,8 +25,8 @@ else
     BACKUP_CREATE_DATABASE_STATEMENT=""
 fi
 
-# Loop through all the defined databases, seperating by a ,
-for CURRENT_DATABASE in ${TARGET_DATABASE_NAMES//,/ }; do
+# Loop through all the databases
+for CURRENT_DATABASE in $(mysql -u $TARGET_DATABASE_USER -p$TARGET_DATABASE_PASSWORD -h $TARGET_DATABASE_HOST -P $TARGET_DATABASE_PORT -e "SELECT schema_name from INFORMATION_SCHEMA.SCHEMATA WHERE schema_name NOT IN('information_schema', 'sys', 'mysql', 'performance_schema')" -s --skip-column-names); do
 
     DUMP=$CURRENT_DATABASE$(date +$BACKUP_TIMESTAMP).sql
     # Perform the database backup. Put the output to a variable. If successful upload the backup to S3, if unsuccessful print an entry to the console and the log, and set has_failed to true.
